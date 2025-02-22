@@ -3,11 +3,15 @@ package br.com.kenmarcos.devstage.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.kenmarcos.devstage.dtos.CreateEventDTO;
+import br.com.kenmarcos.devstage.dtos.CreateEventRequestDTO;
 import br.com.kenmarcos.devstage.entities.EventEntity;
+import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceAlreadyExistsException;
+import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceNotFoundException;
+import br.com.kenmarcos.devstage.exceptions.dtos.ErrorMessageDTO;
 import br.com.kenmarcos.devstage.services.CreateEventService;
 import br.com.kenmarcos.devstage.services.FetchEventsService;
 import br.com.kenmarcos.devstage.services.GetEventByPrettyNameService;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class EventController {
   private GetEventByPrettyNameService getEventByPrettyNameService;
   
   @PostMapping()
-  public ResponseEntity<Object> createEvent(@RequestBody CreateEventDTO createEventDTO) {
+  public ResponseEntity<Object> createEvent(@Valid @RequestBody CreateEventRequestDTO createEventDTO) {
     try {
       var eventEntity = EventEntity.builder()
       .title(createEventDTO.getTitle())
@@ -46,8 +50,11 @@ public class EventController {
 
       EventEntity event = createEventService.execute(eventEntity);
       return ResponseEntity.status(HttpStatus.CREATED).body(event);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (ResourceAlreadyExistsException ex) {
+      ErrorMessageDTO error = ErrorMessageDTO.builder().message(ex.getMessage()).build();
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }catch (Exception ex) {
+      return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
 
@@ -57,8 +64,8 @@ public class EventController {
       List<EventEntity> events = fetchEventsService.execute();
   
       return ResponseEntity.ok().body(events);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception ex) {
+      return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
 
@@ -68,8 +75,11 @@ public class EventController {
       EventEntity event = getEventByPrettyNameService.execute(prettyName);
   
       return ResponseEntity.ok().body(event);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (ResourceNotFoundException ex) {
+      ErrorMessageDTO error = ErrorMessageDTO.builder().message(ex.getMessage()).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    } catch (Exception ex) {
+      return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
 }

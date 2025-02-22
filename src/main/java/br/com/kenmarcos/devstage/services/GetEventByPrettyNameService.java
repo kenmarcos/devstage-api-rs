@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.kenmarcos.devstage.repositories.EventRepository;
 import br.com.kenmarcos.devstage.entities.EventEntity;
+import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceNotFoundException;
 
 
 @Service
@@ -14,6 +15,10 @@ public class GetEventByPrettyNameService {
 
   public EventEntity execute(String prettyName) {
     EventEntity event = eventRepository.findByPrettyName(prettyName);
+
+    if (event == null) {
+      throw new ResourceNotFoundException("Event with pretty name '" + prettyName + "' not found");
+    }
 
     return event;
   }
