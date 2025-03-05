@@ -6,12 +6,11 @@
     <p>
         <a href="#%EF%B8%8F-sobre-o-projeto">Sobre o Projeto</a> •
         <a href="#-endpoints">Endpoints</a> •
-        <a href="#-utilização">Utilização</a> •
         <a href="#%EF%B8%8F-tecnologias">Tecnologias</a> •
         <a href="#-autor">Autor</a>
     </p>
     <p align="center">
-        <img alt="home page Board" src=".github/cover.png" width=800/>
+        <img alt="Capa do projeto DevStage" src=".github/cover.png" width=800/>
     </p>
 </div>
 
@@ -31,8 +30,15 @@ Através dessa aplicação, um usuário pode se inscrever em um evento, gerar um
 
 ## 💡 Endpoints
 
-| Método | Endpoint         | Responsabilidade                                       |
-| ------ | ---------------- | ------------------------------------------------------ |
+| Método | Endpoint                                 | Responsabilidade                                         |
+| ------ | ---------------------------------------- | -------------------------------------------------------- |
+| POST   | /events                                  | Cria um evento                                           |
+| GET    | /events                                  | Lista todos os eventos                                   |
+| GET    | /events/:prettyName                      | Busca por um evento específico                           |
+| POST   | /subcription/:prettyName                 | Inscreve usuário em um evento                            |
+| POST   | /subcription/:prettyName/:userId         | Inscreve usuário em um evento através de indicação       |
+| GET    | /subcription/:prettyName/ranking         | Obtém o ranking de indicações de um evento               |
+| GET    | /subcription/:prettyName/ranking/:userId | Obtém o ranking de um usuário em indicações de um evento |
 
 <!-- TECNOLOGIAS -->
 
