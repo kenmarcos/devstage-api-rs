@@ -15,12 +15,12 @@ import br.com.kenmarcos.devstage.entities.UserEntity;
 public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity, UUID> {
   public SubscriptionEntity findByEventAndSubscriber(EventEntity event, UserEntity subscriber);
 
-  @Query(value = "select tu.name, count(ts.id) as quantidade" + 
+  @Query(value = "select tu.name, bin_to_uuid(ts.indication_user_id), count(ts.id) as quantidade" + 
                 " from tbl_subscription as ts inner join tbl_user as tu" + 
                 " on ts.indication_user_id = tu.id " + 
                 " where ts.indication_user_id is not null" + 
                 "    and ts.event_id = :eventId" + 
-                " group by tu.name" + 
+                " group by ts.indication_user_id" + 
                 " order by quantidade desc", nativeQuery = true)
   public List<SubscriptionRankingItemDTO> generateRanking(@Param("eventId") UUID eventId);
 

@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.kenmarcos.devstage.dtos.CreateSubscriptionRequestDTO;
 import br.com.kenmarcos.devstage.dtos.CreateSubscriptionResponseDTO;
 import br.com.kenmarcos.devstage.dtos.SubscriptionRankingItemDTO;
-import br.com.kenmarcos.devstage.entities.EventEntity;
+import br.com.kenmarcos.devstage.dtos.UserRankingDTO;
 import br.com.kenmarcos.devstage.entities.UserEntity;
 import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceAlreadyExistsException;
 import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceNotFoundException;
 import br.com.kenmarcos.devstage.services.CreateSubscriptionService;
 import br.com.kenmarcos.devstage.services.GetCompleteRankingService;
+import br.com.kenmarcos.devstage.services.GetUserRankingService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController()
@@ -34,6 +34,9 @@ public class SubscriptionController {
 
   @Autowired
   private GetCompleteRankingService getCompleteRankingService;
+
+  @Autowired
+  private GetUserRankingService getUserRanking;
   
   @PostMapping({"/{prettyName}", "/{prettyName}/{indicatorId}"})
   public ResponseEntity<Object> createSubscription(
@@ -59,9 +62,22 @@ public class SubscriptionController {
   @GetMapping("/{prettyName}/ranking")
   public ResponseEntity<Object> generateRanking(@PathVariable String prettyName) {
       try {
-        List<SubscriptionRankingItemDTO> ranking = getCompleteRankingService.execute(prettyName);
+        List<SubscriptionRankingItemDTO> ranking = getCompleteRankingService.execute(prettyName).subList(0, 3);
 
         return ResponseEntity.ok().body(ranking);
+      } catch (ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+      } catch (Exception ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+      }
+  }
+
+  @GetMapping("/{prettyName}/ranking/{userId}")
+  public ResponseEntity<Object> generateRankingByEventAndUser(@PathVariable String prettyName, @PathVariable UUID userId) {
+      try {
+        UserRankingDTO userRanking = getUserRanking.execute(prettyName, userId);
+
+        return ResponseEntity.ok().body(userRanking);
       } catch (ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
       } catch (Exception ex) {

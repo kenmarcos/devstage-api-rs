@@ -27,7 +27,7 @@ public class GetCompleteRankingService {
       throw new ResourceNotFoundException("Ranking do evento '" + prettyName + "' não existe");
     }
 
-    List<SubscriptionRankingItemDTO> ranking = subscriptionRepository.generateRanking(event.getId()).subList(0, 3);
+    List<SubscriptionRankingItemDTO> ranking = subscriptionRepository.generateRanking(event.getId());
 
     return ranking;
   }
