@@ -1,5 +1,6 @@
 package br.com.kenmarcos.devstage.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,18 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.kenmarcos.devstage.dtos.CreateSubscriptionRequestDTO;
 import br.com.kenmarcos.devstage.dtos.CreateSubscriptionResponseDTO;
+import br.com.kenmarcos.devstage.dtos.SubscriptionRankingItemDTO;
 import br.com.kenmarcos.devstage.entities.EventEntity;
 import br.com.kenmarcos.devstage.entities.UserEntity;
 import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceAlreadyExistsException;
 import br.com.kenmarcos.devstage.exceptions.customExceptions.ResourceNotFoundException;
 import br.com.kenmarcos.devstage.services.CreateSubscriptionService;
+import br.com.kenmarcos.devstage.services.GetCompleteRankingService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController()
 @RequestMapping("/api/subscription")
 public class SubscriptionController {
   @Autowired
   private CreateSubscriptionService createSubscriptionService;
+
+  @Autowired
+  private GetCompleteRankingService getCompleteRankingService;
   
   @PostMapping({"/{prettyName}", "/{prettyName}/{indicatorId}"})
   public ResponseEntity<Object> createSubscription(
@@ -46,4 +55,18 @@ public class SubscriptionController {
       return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
+
+  @GetMapping("/{prettyName}/ranking")
+  public ResponseEntity<Object> generateRanking(@PathVariable String prettyName) {
+      try {
+        List<SubscriptionRankingItemDTO> ranking = getCompleteRankingService.execute(prettyName);
+
+        return ResponseEntity.ok().body(ranking);
+      } catch (ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+      } catch (Exception ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+      }
+  }
+  
 }
